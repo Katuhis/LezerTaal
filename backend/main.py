@@ -1,6 +1,21 @@
 from fastapi import FastAPI
+from contextlib import asynccontextmanager
 
-app = FastAPI()
+from services.database import client
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    try:
+        client.admin.command('ping')
+        print('MongoDB connected')
+    except Exception as e :
+        raise RuntimeError(f"MongoDB connection failed: {e}")
+
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 @app.get("/health")
 def health():
