@@ -1,8 +1,7 @@
-import datetime
-from unittest.mock import patch
-
 import pytest
 
+from datetime import datetime
+from unittest.mock import patch
 from services.texts import create_text, get_text, delete_text, update_text
 from bson import ObjectId
 
@@ -27,7 +26,7 @@ def test_get_text_success():
             'content': 'content',
             'language': 'language',
             'user_id': ObjectId(),
-            'created_at': datetime.datetime.now()
+            'created_at': datetime.now()
         }
         result = get_text(str(ObjectId()))
         assert result['title'] == "title"

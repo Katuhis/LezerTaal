@@ -1,5 +1,4 @@
-import datetime
-
+from datetime import datetime
 from services.database import texts_collection
 from bson import ObjectId
 
@@ -11,7 +10,7 @@ def create_text(
         user_id: str,
         section_id: str = None,
 ):
-    created_at = datetime.datetime.now()
+    created_at = datetime.now()
 
     text = {
         'title': title,
