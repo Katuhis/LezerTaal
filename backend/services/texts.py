@@ -1,9 +1,10 @@
 from datetime import datetime
 from services.database import texts_collection
 from bson import ObjectId
+from services.utils import serialize_text
 
 
-def create_text(
+def db_create_text(
         title: str,
         content: str,
         language: str,
@@ -24,22 +25,24 @@ def create_text(
     result = texts_collection.insert_one(text)
     return result.inserted_id
 
-def get_text(text_id: str):
+def db_get_text(text_id: str):
     result = texts_collection.find_one({'_id': ObjectId(text_id)})
     if result is None:
         raise ValueError(f"Text {text_id} was not found.")
-    return result
 
-def get_texts(user_id: str):
-    return list(texts_collection.find({'user_id': ObjectId(user_id)}))
+    return serialize_text(result)
 
-def delete_text(text_id: str):
+def db_get_texts(user_id: str):
+    texts = list(texts_collection.find({'user_id': ObjectId(user_id)}))
+    return [serialize_text(text) for text in texts]
+
+def db_delete_text(text_id: str):
     result = texts_collection.delete_one({'_id': ObjectId(text_id)})
     if result.deleted_count == 0:
         raise ValueError(f"Text {text_id} was not found.")
     return result.deleted_count
 
-def update_text(
+def db_update_text(
         text_id: str,
         title: str = None,
         language: str = None,
