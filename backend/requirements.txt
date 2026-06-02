@@ -6,3 +6,4 @@ pytest
 httpx
 pymongo[srv]
 pydantic
+pytest-cov

@@ -28,7 +28,7 @@ def db_create_text(
 def db_get_text(text_id: str):
     result = texts_collection.find_one({'_id': ObjectId(text_id)})
     if result is None:
-        raise ValueError(f"Text {text_id} was not found.")
+        raise ValueError(f"Text {text_id} was not found")
 
     return serialize_text(result)
 

@@ -2,7 +2,7 @@ import pytest
 
 from datetime import datetime
 from unittest.mock import patch
-from services.texts import db_create_text, db_get_text, db_delete_text, db_update_text
+from services.texts import db_create_text, db_get_text, db_delete_text, db_update_text, db_get_texts
 from bson import ObjectId
 
 
@@ -18,6 +18,21 @@ def test_create_text_success():
         )
         assert result == "some_id"
 
+def test_get_texts():
+    with patch('services.texts.texts_collection') as mock_collection:
+        mock_collection.find.return_value = [{
+            "_id": ObjectId(),
+            'title': 'title',
+            'content': 'content',
+            'language': 'language',
+            'user_id': ObjectId(),
+            'created_at': datetime.now(),
+            'section_id': ObjectId(),
+        }]
+        result = db_get_texts(str(ObjectId()))
+        assert len(result) == 1
+        assert result[0].title == "title"
+
 def test_get_text_success():
     with patch('services.texts.texts_collection') as mock_collection:
         mock_collection.find_one.return_value = {
@@ -26,10 +41,11 @@ def test_get_text_success():
             'content': 'content',
             'language': 'language',
             'user_id': ObjectId(),
-            'created_at': datetime.now()
+            'created_at': datetime.now(),
+            'section_id': ObjectId(),
         }
         result = db_get_text(str(ObjectId()))
-        assert result['title'] == "title"
+        assert result.title == "title"
 
 def test_get_text_failure():
     with patch('services.texts.texts_collection') as mock_collection:
