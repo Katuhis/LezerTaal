@@ -1,15 +1,18 @@
 import pytest
 
 from datetime import datetime
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch, MagicMock
 from services.texts import db_create_text, db_get_text, db_delete_text, db_update_text, db_get_texts
 from bson import ObjectId
 
 
-def test_create_text_success():
+pytestmark = pytest.mark.asyncio
+
+
+async def test_create_text_success():
     with patch('services.texts.texts_collection') as mock_collection:
-        mock_collection.insert_one.return_value.inserted_id = "some_id"
-        result = db_create_text(
+        mock_collection.insert_one = AsyncMock(return_value=MagicMock(inserted_id="some_id"))
+        result = await db_create_text(
             title='title',
             content='content',
             language='language',
@@ -18,9 +21,10 @@ def test_create_text_success():
         )
         assert result == "some_id"
 
-def test_get_texts():
+async def test_get_texts():
     with patch('services.texts.texts_collection') as mock_collection:
-        mock_collection.find.return_value = [{
+        mock_cursor = AsyncMock()
+        mock_cursor.to_list = AsyncMock(return_value=[{
             "_id": ObjectId(),
             'title': 'title',
             'content': 'content',
@@ -28,14 +32,15 @@ def test_get_texts():
             'user_id': ObjectId(),
             'created_at': datetime.now(),
             'section_id': ObjectId(),
-        }]
-        result = db_get_texts(str(ObjectId()))
+        }])
+        mock_collection.find.return_value = mock_cursor
+        result = await db_get_texts(str(ObjectId()))
         assert len(result) == 1
         assert result[0].title == "title"
 
-def test_get_text_success():
-    with patch('services.texts.texts_collection') as mock_collection:
-        mock_collection.find_one.return_value = {
+async def test_get_text_success():
+    with (patch('services.texts.texts_collection') as mock_collection):
+        mock_collection.find_one = AsyncMock(return_value={
             "_id": ObjectId(),
             'title': 'title',
             'content': 'content',
@@ -43,32 +48,32 @@ def test_get_text_success():
             'user_id': ObjectId(),
             'created_at': datetime.now(),
             'section_id': ObjectId(),
-        }
-        result = db_get_text(str(ObjectId()))
+        })
+        result = await db_get_text(str(ObjectId()))
         assert result.title == "title"
 
-def test_get_text_failure():
-    with patch('services.texts.texts_collection') as mock_collection:
-        mock_collection.find_one.return_value = None
+async def test_get_text_failure():
+    with (patch('services.texts.texts_collection') as mock_collection):
+        mock_collection.find_one = AsyncMock(return_value=None)
         with pytest.raises(ValueError):
-            db_get_text(str(ObjectId()))
+            await db_get_text(str(ObjectId()))
 
-def test_delete_text_success():
-    with patch('services.texts.texts_collection') as mock_collection:
-        mock_collection.delete_one.return_value.deleted_count = 1
-        result = db_delete_text(str(ObjectId()))
+async def test_delete_text_success():
+    with (patch('services.texts.texts_collection') as mock_collection):
+        mock_collection.delete_one = AsyncMock(return_value=MagicMock(deleted_count=1))
+        result = await db_delete_text(str(ObjectId()))
         assert result == 1
 
-def test_delete_text_failure():
+async def test_delete_text_failure():
     with patch('services.texts.texts_collection') as mock_collection:
-        mock_collection.delete_one.return_value.deleted_count = 0
+        mock_collection.delete_one = AsyncMock(return_value=MagicMock(deleted_count=0))
         with pytest.raises(ValueError):
-            db_delete_text(str(ObjectId()))
+            await db_delete_text(str(ObjectId()))
 
-def test_update_text_success():
-    with patch('services.texts.texts_collection') as mock_collection:
-        mock_collection.update_one.return_value.modified_count = 1
-        result = db_update_text(
+async def test_update_text_success():
+    with (patch('services.texts.texts_collection') as mock_collection):
+        mock_collection.update_one = AsyncMock(return_value=MagicMock(modified_count=1))
+        result = await db_update_text(
             str(ObjectId()),
             'title',
             'language',
@@ -76,11 +81,11 @@ def test_update_text_success():
         )
         assert result == 1
 
-def test_update_text_failure():
+async def test_update_text_failure():
     with patch('services.texts.texts_collection') as mock_collection:
-        mock_collection.update_one.return_value.modified_count = 0
+        mock_collection.update_one = AsyncMock(return_value=MagicMock(modified_count=0))
         with pytest.raises(ValueError):
-            db_update_text(
+            await db_update_text(
                 str(ObjectId()),
                 'title',
                 'language',

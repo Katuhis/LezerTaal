@@ -8,7 +8,7 @@ from routers.texts import router as text_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     try:
-        client.admin.command('ping')
+        await client.admin.command('ping')
         print('MongoDB connected')
     except Exception as e :
         raise RuntimeError(f"MongoDB connection failed: {e}")

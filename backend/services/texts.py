@@ -4,7 +4,7 @@ from bson import ObjectId
 from services.utils import serialize_text
 
 
-def db_create_text(
+async def db_create_text(
         title: str,
         content: str,
         language: str,
@@ -22,27 +22,27 @@ def db_create_text(
         'created_at': created_at,
     }
 
-    result = texts_collection.insert_one(text)
+    result = await texts_collection.insert_one(text)
     return result.inserted_id
 
-def db_get_text(text_id: str):
-    result = texts_collection.find_one({'_id': ObjectId(text_id)})
+async def db_get_text(text_id: str):
+    result = await texts_collection.find_one({'_id': ObjectId(text_id)})
     if result is None:
         raise ValueError(f"Text {text_id} was not found")
 
     return serialize_text(result)
 
-def db_get_texts(user_id: str):
-    texts = list(texts_collection.find({'user_id': ObjectId(user_id)}))
+async def db_get_texts(user_id: str):
+    texts = await texts_collection.find({'user_id': ObjectId(user_id)}).to_list()
     return [serialize_text(text) for text in texts]
 
-def db_delete_text(text_id: str):
-    result = texts_collection.delete_one({'_id': ObjectId(text_id)})
+async def db_delete_text(text_id: str):
+    result = await texts_collection.delete_one({'_id': ObjectId(text_id)})
     if result.deleted_count == 0:
         raise ValueError(f"Text {text_id} was not found.")
     return result.deleted_count
 
-def db_update_text(
+async def db_update_text(
         text_id: str,
         title: str = None,
         language: str = None,
@@ -56,7 +56,7 @@ def db_update_text(
     if section_id:
         text['section_id'] = ObjectId(section_id)
 
-    result = texts_collection.update_one({'_id': ObjectId(text_id)}, {'$set': text})
+    result = await texts_collection.update_one({'_id': ObjectId(text_id)}, {'$set': text})
     if result.modified_count == 0:
         raise ValueError(f"Text {text_id} was not found.")
 
