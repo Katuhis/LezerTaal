@@ -1,7 +1,34 @@
 from datetime import datetime
+from typing import Optional
+
 from services.database import texts_collection
 from bson import ObjectId
 from services.utils import serialize_text
+
+
+async def db_get_texts(user_id: str, section_id: Optional[str] = None):
+    if section_id:
+        texts = await texts_collection.find(
+            {
+                'user_id': ObjectId(user_id),
+                'section_id': ObjectId(section_id)
+            }
+        ).to_list()
+    else:
+        texts = await texts_collection.find(
+            {
+                'user_id': ObjectId(user_id),
+                'section_id': None
+            }
+        ).to_list()
+    return [serialize_text(text) for text in texts]
+
+async def db_get_text(text_id: str):
+    result = await texts_collection.find_one({'_id': ObjectId(text_id)})
+    if result is None:
+        raise ValueError(f"Text {text_id} was not found")
+
+    return serialize_text(result)
 
 
 async def db_create_text(
@@ -9,7 +36,7 @@ async def db_create_text(
         content: str,
         language: str,
         user_id: str,
-        section_id: str = None,
+        section_id: Optional[str] = None,
 ):
     created_at = datetime.now()
 
@@ -25,28 +52,11 @@ async def db_create_text(
     result = await texts_collection.insert_one(text)
     return result.inserted_id
 
-async def db_get_text(text_id: str):
-    result = await texts_collection.find_one({'_id': ObjectId(text_id)})
-    if result is None:
-        raise ValueError(f"Text {text_id} was not found")
-
-    return serialize_text(result)
-
-async def db_get_texts(user_id: str):
-    texts = await texts_collection.find({'user_id': ObjectId(user_id)}).to_list()
-    return [serialize_text(text) for text in texts]
-
-async def db_delete_text(text_id: str):
-    result = await texts_collection.delete_one({'_id': ObjectId(text_id)})
-    if result.deleted_count == 0:
-        raise ValueError(f"Text {text_id} was not found.")
-    return result.deleted_count
-
 async def db_update_text(
         text_id: str,
-        title: str = None,
-        language: str = None,
-        section_id: str = None,
+        title: Optional[str] = None,
+        language: Optional[str] = None,
+        section_id: Optional[str] = None,
 ):
     text = {}
     if title:
@@ -61,3 +71,13 @@ async def db_update_text(
         raise ValueError(f"Text {text_id} was not found.")
 
     return result.modified_count
+
+async def db_delete_texts_by_section(user_id: str, section_id: str):
+    result = await texts_collection.delete_many({'user_id': ObjectId(user_id), 'section_id': ObjectId(section_id)})
+    return result.deleted_count
+
+async def db_delete_text(text_id: str):
+    result = await texts_collection.delete_one({'_id': ObjectId(text_id)})
+    if result.deleted_count == 0:
+        raise ValueError(f"Text {text_id} was not found.")
+    return result.deleted_count

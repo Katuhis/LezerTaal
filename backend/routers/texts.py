@@ -1,18 +1,21 @@
+from typing import Optional
+
 from fastapi import APIRouter, Body, HTTPException
 
 from models import TextCreate
-from services.texts import db_create_text, db_get_texts, db_get_text, db_update_text, db_delete_text
+from services.texts import db_create_text, db_get_texts, db_get_text, db_update_text, db_delete_text, db_delete_texts_by_section
 
 USER_ID='6a0c644e3ad7680112699251'
 
 router = APIRouter(prefix="/texts", tags=["texts"])
 
-@router.get("/")
-async def get_texts():
-    texts = await db_get_texts(USER_ID)
+
+@router.get("")
+async def get_texts(section_id: Optional[str] = None):
+    texts = await db_get_texts(USER_ID, section_id)
     return {"result": texts}
 
-@router.post("/", status_code=201)
+@router.post("", status_code=201)
 async def post_text(text: TextCreate = Body(...)):
     if text.title is None:
         text.title = ' '.join(text.content.split()[:5])
@@ -35,7 +38,7 @@ async def get_text(text_id: str):
         raise HTTPException(status_code=404, detail="Text not found")
 
 @router.put("/{text_id}", status_code=200)
-async def put_text(text_id, text: TextCreate = Body(...)):
+async def put_text(text_id: str, text: TextCreate = Body(...)):
     try:
         result = await db_update_text(
             text_id,
@@ -46,6 +49,10 @@ async def put_text(text_id, text: TextCreate = Body(...)):
         return {"result": result}
     except ValueError:
         raise HTTPException(status_code=404, detail="Text not found")
+
+@router.delete("/by-section/{section_id}", status_code=204)
+async def delete_texts_by_section(section_id: str):
+    await db_delete_texts_by_section(USER_ID, section_id)
 
 @router.delete("/{text_id}", status_code=204)
 async def delete_text(text_id: str):

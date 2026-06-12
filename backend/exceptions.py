@@ -1,0 +1,2 @@
+class SectionNotEmptyError(Exception):
+    pass

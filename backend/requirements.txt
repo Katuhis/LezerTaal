@@ -8,3 +8,4 @@ pymongo[srv]
 pydantic
 pytest-cov
 pytest-asyncio
+mongomock_motor

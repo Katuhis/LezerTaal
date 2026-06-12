@@ -1,4 +1,4 @@
-from models import TextResponse
+from models import TextResponse, SectionResponse
 
 
 def serialize_text(text):
@@ -7,8 +7,14 @@ def serialize_text(text):
         title=text['title'],
         content=text['content'],
         language=text['language'],
-        user_id=str(text['user_id']),
         section_id=str(text['section_id']) if text['section_id'] else None,
         created_at=str(text['created_at'])
     )
-    
+
+def serialize_section(section):
+    return SectionResponse(
+        _id=str(section['_id']),
+        title=section['title'],
+        parent_id=str(section['parent_id']) if section['parent_id'] else None,
+        created_at=str(section['created_at'])
+    )

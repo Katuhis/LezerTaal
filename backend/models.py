@@ -14,7 +14,17 @@ class TextResponse(BaseModel):
     title: Optional[str] = None
     content: str
     language: str
-    user_id: str
     section_id: Optional[str] = None
+    created_at: str
+    model_config = ConfigDict(populate_by_name=True)
+
+class SectionCreate(BaseModel):
+    title: str
+    parent_id: Optional[str] = None
+
+class SectionResponse(BaseModel):
+    id: str = Field(alias="_id")
+    title: str
+    parent_id: Optional[str] = None
     created_at: str
     model_config = ConfigDict(populate_by_name=True)
