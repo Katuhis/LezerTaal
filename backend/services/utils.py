@@ -1,3 +1,5 @@
+from passlib.context import CryptContext
+
 from models import TextResponse, SectionResponse
 
 
@@ -18,3 +20,11 @@ def serialize_section(section):
         parent_id=str(section['parent_id']) if section['parent_id'] else None,
         created_at=str(section['created_at'])
     )
+
+pwd_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+
+def hash_password(password: str) -> str:
+    return pwd_context.hash(password)
+
+def verify_password(plain_password: str, hashed_password: str) -> bool:
+    return pwd_context.verify(plain_password, hashed_password)

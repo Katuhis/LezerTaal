@@ -23,6 +23,7 @@ async def mock_db():
         patch("services.texts.texts_collection", db["texts"]),
         patch("services.sections.sections_collection", db["sections"]),
         patch("services.sections.texts_collection", db["texts"]),
+        patch("services.users.users_collection", db["users"]),
     ):
         yield db
 
@@ -30,8 +31,8 @@ async def mock_db():
 async def seed(mock_db):
     user_ids = [ObjectId(), ObjectId()]
     await mock_db["users"].insert_many([
-        {"_id": user_ids[0], "email": "anna@test.nl"},
-        {"_id": user_ids[1], "email": "bram@test.nl"},
+        {"_id": user_ids[0], "email": "anna@test.nl", "language": "ru"},
+        {"_id": user_ids[1], "email": "bram@test.nl", "language": "ru"},
     ])
 
     section_ids = [ObjectId(), ObjectId()]

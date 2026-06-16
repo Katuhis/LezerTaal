@@ -4,6 +4,7 @@ from typing import Optional
 from services.database import texts_collection
 from bson import ObjectId
 from services.utils import serialize_text
+from models import Language
 
 
 async def db_get_texts(user_id: str, section_id: Optional[str] = None):
@@ -34,7 +35,7 @@ async def db_get_text(text_id: str):
 async def db_create_text(
         title: str,
         content: str,
-        language: str,
+        language: Language,
         user_id: str,
         section_id: Optional[str] = None,
 ):
@@ -55,7 +56,7 @@ async def db_create_text(
 async def db_update_text(
         text_id: str,
         title: Optional[str] = None,
-        language: Optional[str] = None,
+        language: Optional[Language] = None,
         section_id: Optional[str] = None,
 ):
     text = {}

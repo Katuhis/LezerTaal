@@ -9,3 +9,5 @@ pydantic
 pytest-cov
 pytest-asyncio
 mongomock_motor
+passlib
+bcrypt==4.0.1

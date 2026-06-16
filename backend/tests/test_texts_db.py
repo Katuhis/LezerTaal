@@ -3,6 +3,7 @@ import pytest
 from datetime import datetime
 from services.texts import db_create_text, db_get_text, db_delete_text, db_update_text, db_get_texts, db_delete_texts_by_section
 from bson import ObjectId
+from models import Language
 
 
 pytestmark = pytest.mark.asyncio
@@ -64,7 +65,7 @@ async def test_get_text_success(mock_db, seed):
         "_id": text_id,
         "title": "title",
         "content": "content",
-        "language": "language",
+        "language": "nl",
         "user_id": user_id,
         "section_id": None,
         "created_at": datetime.now(),
@@ -84,7 +85,7 @@ async def test_create_text_success(mock_db, seed):
     result = await db_create_text(
         title="title",
         content="content",
-        language="language",
+        language=Language.NL,
         user_id=str(user_id),
         section_id=str(section_id),
     )
@@ -93,7 +94,7 @@ async def test_create_text_success(mock_db, seed):
     assert saved is not None
     assert saved["title"] == "title"
     assert saved["content"] == "content"
-    assert saved["language"] == "language"
+    assert saved["language"] == "nl"
     assert saved["user_id"] == user_id
     assert saved["section_id"] == section_id
 
@@ -107,7 +108,7 @@ async def test_update_text_success(mock_db, seed):
         "_id": text_id,
         "title": "old title",
         "content": "content",
-        "language": "old language",
+        "language": "en",
         "user_id": user_id,
         "section_id": None,
         "created_at": datetime.now(),
@@ -116,14 +117,14 @@ async def test_update_text_success(mock_db, seed):
     result = await db_update_text(
         str(text_id),
         title="new title",
-        language="new language",
+        language=Language.NL,
         section_id=str(new_section_id)
     )
     assert result == 1
 
     saved = await mock_db["texts"].find_one({"_id": text_id})
     assert saved["title"] == "new title"
-    assert saved["language"] == "new language"
+    assert saved["language"] == "nl"
     assert saved["section_id"] == new_section_id
 
 
@@ -140,7 +141,7 @@ async def test_delete_text_success(mock_db, seed):
         "_id": text_id,
         "title": "title",
         "content": "content",
-        "language": "language",
+        "language": "nl",
         "user_id": user_id,
         "section_id": None,
         "created_at": datetime.now(),
@@ -168,7 +169,7 @@ async def test_delete_texts_by_section(mock_db, seed):
             "_id": ObjectId(),
             "title": "text 1",
             "content": "content",
-            "language": "language",
+            "language": "nl",
             "user_id": user_id,
             "section_id": section_id_0,
             "created_at": datetime.now(),
@@ -177,7 +178,7 @@ async def test_delete_texts_by_section(mock_db, seed):
             "_id": ObjectId(),
             "title": "text 2",
             "content": "content",
-            "language": "language",
+            "language": "nl",
             "user_id": user_id,
             "section_id": section_id_0,
             "created_at": datetime.now(),
@@ -186,7 +187,7 @@ async def test_delete_texts_by_section(mock_db, seed):
             "_id": ObjectId(),
             "title": "text 3",
             "content": "content",
-            "language": "language",
+            "language": "nl",
             "user_id": user_id,
             "section_id": section_id_1,
             "created_at": datetime.now(),
