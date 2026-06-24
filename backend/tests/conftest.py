@@ -8,6 +8,9 @@ from unittest.mock import patch
 from bson import ObjectId
 
 from main import app
+from services.auth import get_current_user
+
+app.dependency_overrides[get_current_user] = lambda: "6a0c644e3ad7680112699251"
 
 @pytest_asyncio.fixture
 async def client():

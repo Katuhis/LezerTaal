@@ -4,7 +4,7 @@
 Загрузка текста → выделение слова → AI-объяснение → сохранение в словарь.
 
 Стек: Python/FastAPI, MongoDB Atlas (`AsyncMongoClient`, pymongo 4.17), pytest-asyncio,
-httpx, mongomock-motor, spaCy, Anthropic API. Фронт: SolidJS (муж).
+httpx, mongomock-motor, spaCy, Anthropic API, passlib[bcrypt], python-jose. Фронт: SolidJS (муж).
 
 ---
 
@@ -21,12 +21,17 @@ httpx, mongomock-motor, spaCy, Anthropic API. Фронт: SolidJS (муж).
 
 ---
 
-## Фаза 2 — Авторизация
+## Фаза 2 — Авторизация ✅ закрыта
 
-- [ ] JWT-авторизация
-- [ ] `user_id` из токена вместо хардкода `USER_ID` — заменить в `routers/texts.py` и `routers/sections.py`
-- [ ] Регистрация/логин эндпоинты, коллекция `users`
-- [ ] Тесты на авторизацию
+- [x] `Language` enum в `models.py`; `text_language` в `Text` мигрирован со строки на `Language`
+- [x] Модели `User`, `UserCreate`, `UserResponse`, `UserLogin` в `models.py`
+- [x] `db_create_user`, `db_get_user_by_email` в `services/users.py`; ошибки через `ValueError`
+- [x] Хэширование паролей: `hash_password`, `verify_password` в `services/utils.py` (`passlib[bcrypt]`, `bcrypt==4.0.1`)
+- [x] JWT: `create_access_token`, `decode_access_token`, `get_current_user` в `services/auth.py` (`python-jose`, `HTTPBearer`)
+- [x] Эндпоинты `POST /auth/register`, `POST /auth/login` в `routers/auth.py`
+- [x] `USER_ID` заменён на `Depends(get_current_user)` в `routers/texts.py` и `routers/sections.py`
+- [x] Тесты на всё (DB + API + сервисы), покрытие 100%
+- [x] `dependency_overrides` в `conftest.py` для тестов роутеров
 
 ---
 

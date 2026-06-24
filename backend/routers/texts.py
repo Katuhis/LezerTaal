@@ -1,22 +1,22 @@
 from typing import Optional
 
-from fastapi import APIRouter, Body, HTTPException
+from fastapi import APIRouter, Body, HTTPException, Depends
 
 from models import TextCreate
 from services.texts import db_create_text, db_get_texts, db_get_text, db_update_text, db_delete_text, db_delete_texts_by_section
+from services.auth import get_current_user
 
-USER_ID='6a0c644e3ad7680112699251'
 
 router = APIRouter(prefix="/texts", tags=["texts"])
 
 
 @router.get("")
-async def get_texts(section_id: Optional[str] = None):
-    texts = await db_get_texts(USER_ID, section_id)
+async def get_texts(section_id: Optional[str] = None, user_id: str = Depends(get_current_user)):
+    texts = await db_get_texts(user_id, section_id)
     return {"result": texts}
 
 @router.post("", status_code=201)
-async def post_text(text: TextCreate = Body(...)):
+async def post_text(text: TextCreate = Body(...), user_id: str = Depends(get_current_user)):
     if text.title is None:
         text.title = ' '.join(text.content.split()[:5])
 
@@ -24,7 +24,7 @@ async def post_text(text: TextCreate = Body(...)):
         text.title,
         text.content,
         text.language,
-        USER_ID,
+        user_id,
         text.section_id)
 
     return {"result": str(result)}
@@ -51,8 +51,8 @@ async def put_text(text_id: str, text: TextCreate = Body(...)):
         raise HTTPException(status_code=404, detail="Text not found")
 
 @router.delete("/by-section/{section_id}", status_code=204)
-async def delete_texts_by_section(section_id: str):
-    await db_delete_texts_by_section(USER_ID, section_id)
+async def delete_texts_by_section(section_id: str, user_id: str = Depends(get_current_user)):
+    await db_delete_texts_by_section(user_id, section_id)
 
 @router.delete("/{text_id}", status_code=204)
 async def delete_text(text_id: str):

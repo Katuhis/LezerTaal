@@ -4,6 +4,7 @@ from contextlib import asynccontextmanager
 from services.database import client
 from routers.texts import router as text_router
 from routers.sections import router as section_router
+from routers.auth import router as auth_router
 
 
 @asynccontextmanager
@@ -19,6 +20,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 app.include_router(text_router)
 app.include_router(section_router)
+app.include_router(auth_router)
 
 @app.get("/health")
 def health():

@@ -4,7 +4,8 @@ from bson import ObjectId
 from unittest.mock import patch
 
 from models import TextResponse
-from routers.texts import USER_ID
+
+TEST_USER_ID = "6a0c644e3ad7680112699251"
 
 pytestmark = pytest.mark.asyncio
 
@@ -22,7 +23,7 @@ async def test_get_texts_by_section(client):
         section_id = str(ObjectId())
         response = await client.get(f"/texts?section_id={section_id}")
         assert response.status_code == 200
-        mock_get.assert_called_with(USER_ID, section_id)
+        mock_get.assert_called_with(TEST_USER_ID, section_id)
 
 async def test_get_texts_by_id_success(client):
     with patch('routers.texts.db_get_text') as mock_get:

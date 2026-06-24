@@ -40,6 +40,10 @@ class UserCreate(BaseModel):
     password: str
     language: Language
 
+class UserLogin(BaseModel):
+    email: str
+    password: str
+
 class UserResponse(BaseModel):
     id: str = Field(alias="_id")
     email: str
