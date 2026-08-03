@@ -35,39 +35,11 @@ httpx, mongomock-motor, spaCy, Anthropic API, passlib[bcrypt], python-jose. Фр
 
 ---
 
-## Фаза 3 — Словарь 🔄 в работе
+## Фаза 3 — Словарь
 
-**Архитектурные решения:**
-- Лемматизация — только для отдельного выделенного слова (не для целого текста заранее)
-- Лемма spaCy — технический ключ кэша, пользователю не показывается; Van Dale формат (артикль, форма и т.д.) собирает AI отдельно
-- Три сценария выделения (зафиксировано, реализация — позже):
-  1. Одно слово → `get_lemma` → кэш → Van Dale карточка
-  2. Несколько слов как одна лексическая единица (артикль + сущ., heeft/is + причастие, устойчивое выражение) → отдельная функция выделения "главного" слова перед `get_lemma`
-  3. Текст/фраза для перевода смысла → отдельная ветка без леммы и без грамматики
-- Структура документа кэша (коллекция `vocabulary_collection`):
-  ```
-  {
-    lemma,
-    lang,
-    translations: {
-      ru: { headword, grammar, translation, example },
-      en: { headword, grammar, translation, example }
-    }
-  }
-  ```
-- Уникальный составной индекс на (`lemma`, `lang`); гонки — через `try/except DuplicateKeyError` (`pymongo.errors`)
-
-**Сделано:**
-- [x] `services/nlp.py` — модели spaCy (`nl_core_news_sm`, `en_core_web_sm`, `ru_core_news_sm`) загружаются один раз при импорте, словарь `nlp_models` по `Language`
-- [x] `services/vocabulary.py` — `get_lemma(word: str, lang: Language) -> str`
-- [x] Тест `test_vocabulary.py` — `get_lemma` проверена на NL/EN/RU (`parametrize`)
-- [x] `vocabulary_collection` в `services/database.py`
-- [x] Уникальный индекс (`lemma`, `lang`) создаётся в `lifespan` (`main.py`)
-
-**Дальше:**
-- [ ] Функция поиска/вставки в кэш (по `lemma` + `lang`, проверка нужного языка в `translations`)
-- [ ] Обработка `DuplicateKeyError` при вставке
 - [ ] Endpoint объяснения слова (`word`, `context_sentence`, `text_language`, `user_language` → Claude API, near-zero temperature)
+- [ ] Лемматизация через spaCy (`nl_core_news_sm`, `en_core_web_sm`, `ru_core_news_sm`)
+- [ ] Кэширование объяснений: ключ = лемма + язык, вызов Claude API только при промахе кэша
 - [ ] Карточки в стиле Van Dale NT2: `headword`, `grammar`, `translation`, `example`, `example_translation`
 - [ ] Словарь слов и отдельно словарь выражений
 - [ ] Сохранение слов в словарь, теги на словах
