@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from services.database import users_collection
+from database.database import users_collection
 from models import Language
 from services.utils import hash_password
 

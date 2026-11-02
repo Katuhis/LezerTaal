@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Optional
 
-from services.database import texts_collection
+from database.database import texts_collection
 from bson import ObjectId
 from services.utils import serialize_text
 from models import Language

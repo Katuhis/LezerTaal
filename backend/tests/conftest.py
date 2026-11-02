@@ -23,10 +23,11 @@ async def mock_db():
     client = AsyncMongoMockClient()
     db = client["lezertaal_test"]
     with (
-        patch("services.texts.texts_collection", db["texts"]),
-        patch("services.sections.sections_collection", db["sections"]),
-        patch("services.sections.texts_collection", db["texts"]),
-        patch("services.users.users_collection", db["users"]),
+        patch("database.texts.texts_collection", db["texts"]),
+        patch("database.sections.sections_collection", db["sections"]),
+        patch("database.sections.texts_collection", db["texts"]),
+        patch("database.users.users_collection", db["users"]),
+        patch("database.vocabulary.vocabulary_collection", db["vocabulary"]),
     ):
         yield db
 

@@ -2,7 +2,7 @@ from fastapi import APIRouter, HTTPException, Body, Depends
 
 from exceptions import SectionNotEmptyError
 from models import SectionCreate
-from services.sections import db_get_sections_by_parent, db_get_section, db_create_section, db_update_section, db_delete_section
+from database.sections import db_get_sections_by_parent, db_get_section, db_create_section, db_update_section, db_delete_section
 from services.auth import get_current_user
 
 router = APIRouter(prefix="/sections", tags=["sections"])

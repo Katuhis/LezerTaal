@@ -4,7 +4,7 @@ from fastapi import HTTPException, Depends
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
 from config import SECRET_KEY, ACCESS_TOKEN_EXPIRE_MINUTES
-from services.users import db_get_user_by_email
+from database.users import db_get_user_by_email
 
 security = HTTPBearer()
 

@@ -4,8 +4,8 @@ from typing import Optional
 from bson import ObjectId
 
 from exceptions import SectionNotEmptyError
-from services.database import sections_collection, texts_collection
-from services.utils import serialize_text, serialize_section
+from database.database import sections_collection, texts_collection
+from services.utils import serialize_section
 
 
 async def db_get_section(section_id: str):

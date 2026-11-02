@@ -2,7 +2,7 @@ import pytest
 
 from bson import ObjectId
 from datetime import datetime
-from services.sections import db_create_section, db_get_section, db_update_section, db_delete_section, db_get_sections_by_parent
+from database.sections import db_create_section, db_get_section, db_update_section, db_delete_section, db_get_sections_by_parent
 from exceptions import SectionNotEmptyError
 
 pytestmark = pytest.mark.asyncio

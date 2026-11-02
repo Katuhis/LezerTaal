@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Body, HTTPException
 
-from services.users import db_create_user, db_get_user_by_email
+from database.users import db_create_user, db_get_user_by_email
 from models import UserCreate, UserLogin
 from services.utils import verify_password
 from services.auth import create_access_token

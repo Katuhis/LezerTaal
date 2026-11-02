@@ -3,7 +3,7 @@ import pytest
 from bson import ObjectId
 
 from models import Language
-from services.users import db_get_user_by_email, db_create_user
+from database.users import db_get_user_by_email, db_create_user
 
 pytestmark = pytest.mark.asyncio
 

@@ -9,6 +9,13 @@ class Language(str, Enum):
     EN = "en"
     RU = "ru"
 
+class PartOfSpeech(str, Enum):
+    noun = "noun"
+    verb = "verb"
+    adjective = "adjective"
+    adverb = "adverb"
+    article = "article"
+
 class TextCreate(BaseModel):
     title: Optional[str] = None
     content: str = Field(min_length=1)

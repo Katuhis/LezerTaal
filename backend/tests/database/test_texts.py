@@ -1,7 +1,7 @@
 import pytest
 
 from datetime import datetime
-from services.texts import db_create_text, db_get_text, db_delete_text, db_update_text, db_get_texts, db_delete_texts_by_section
+from database.texts import db_create_text, db_get_text, db_delete_text, db_update_text, db_get_texts, db_delete_texts_by_section
 from bson import ObjectId
 from models import Language
 

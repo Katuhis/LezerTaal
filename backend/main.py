@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 
-from services.database import client, vocabulary_collection
+from database.database import client, vocabulary_collection
 from routers.texts import router as text_router
 from routers.sections import router as section_router
 from routers.auth import router as auth_router

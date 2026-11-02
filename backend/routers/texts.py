@@ -3,7 +3,7 @@ from typing import Optional
 from fastapi import APIRouter, Body, HTTPException, Depends
 
 from models import TextCreate
-from services.texts import db_create_text, db_get_texts, db_get_text, db_update_text, db_delete_text, db_delete_texts_by_section
+from database.texts import db_create_text, db_get_texts, db_get_text, db_update_text, db_delete_text, db_delete_texts_by_section
 from services.auth import get_current_user
 
 
