@@ -15,6 +15,7 @@ class PartOfSpeech(str, Enum):
     adjective = "adjective"
     adverb = "adverb"
     article = "article"
+    other = "other"
 
 class TextCreate(BaseModel):
     title: Optional[str] = None
