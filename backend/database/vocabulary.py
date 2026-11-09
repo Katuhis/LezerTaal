@@ -8,16 +8,17 @@ async def db_get_lemma(lemma: str, lang: Language) -> dict | None:
     result = await vocabulary_collection.find_one({'lemma': lemma, 'lang': lang.value})
     return result
 
-async def db_create_lemma(lemma: str, lang: Language, pos: str, grammar: str, user_lang: Language, translation: str) -> dict:
+async def db_create_lemma(lemma: str, lang: Language, user_lang: Language, readings: list[dict]) -> dict:
     card = {
         'lemma': lemma,
         'lang': lang.value,
-        'pos': pos,
-        'grammar': grammar,
-        'translations': {
-            user_lang.value: translation
-        }
+        'readings': {}
     }
+    for reading in readings:
+        card["readings"][reading["pos"]] = {
+            "grammar": reading["grammar"],
+            "translations": {user_lang.value: reading["translation"]}
+        }
     try:
         await vocabulary_collection.insert_one(card)
         result = card
@@ -25,9 +26,20 @@ async def db_create_lemma(lemma: str, lang: Language, pos: str, grammar: str, us
         result = await vocabulary_collection.find_one({'lemma': lemma, 'lang': lang.value})
     return result
 
-async def db_add_translation(lemma: str, lang: Language, user_lang: Language, translation: str) -> int:
+async def db_add_translation(
+        lemma: str,
+        lang: Language,
+        user_lang: Language,
+        translations: dict) -> int:
+    if not translations:
+        return 0
+
+    updates = {}
+    for pos, translation in translations.items():
+        updates[f'readings.{pos}.translations.{user_lang.value}'] = translation
+
     result = await vocabulary_collection.update_one(
         {'lemma': lemma, 'lang': lang.value},
-        {'$set': {f'translations.{user_lang.value}': translation}}
+        {'$set': updates}
     )
     return result.modified_count

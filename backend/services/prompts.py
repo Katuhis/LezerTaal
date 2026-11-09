@@ -6,7 +6,13 @@ User's native language: {user_language}
 Word (base form): {lemma}
 
 Rules:
-- The learner is at A1-B1 level: give the most common, basic meaning only
+- The learner is at A2-B2 level
+- List the readings of this word: the different parts of speech in which
+  this exact spelling is commonly used as a base form
+  (e.g. Dutch "licht" is a noun and an adjective)
+- Return at most 3 readings, the most common one first
+- One reading per part of speech. Do not invent readings that do not exist,
+  and if the word has only one reading, return a list with one item
 - "pos" must be exactly one of: noun, verb, adj, adverb, article, other
   (use "other" for prepositions, pronouns, conjunctions, numerals, etc.)
 - "grammar" must be written only in {text_language}: no words in {user_language}.
@@ -25,16 +31,21 @@ Language-specific rules for "grammar":
 - English: for verbs show infinitive, past simple, past participle;
   for phrasal verbs show the full phrase;
   for nouns show countable/uncountable, plural if countable
+  for adjectives show comparative and superlative
 - Russian: for verbs show aspect (совершенный/несовершенный)
   and the paired aspect form;
   for nouns show gender and genitive singular;
-  for adjectives show all three gender forms
+  for adjectives show all three gender forms and the comparative
 
 Return JSON only, no explanation, no markdown:
 {{
-  "pos": "one of the allowed values",
-  "grammar": "grammatical info in {text_language}",
-  "translation": "1-3 equivalents in {user_language}"
+  "readings": [
+    {{
+      "pos": "one of the allowed values",
+      "grammar": "grammatical info in {text_language}",
+      "translation": "1-3 equivalents in {user_language}"
+    }}
+  ]
 }}
 
 Do not wrap in markdown. Return raw JSON only."""

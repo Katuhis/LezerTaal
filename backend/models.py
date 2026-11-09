@@ -12,7 +12,7 @@ class Language(str, Enum):
 class PartOfSpeech(str, Enum):
     noun = "noun"
     verb = "verb"
-    adjective = "adjective"
+    adj = "adjective"
     adverb = "adverb"
     article = "article"
     other = "other"

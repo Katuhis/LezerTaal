@@ -13,7 +13,7 @@ LANGUAGE_NAMES = {
     Language.RU: "Russian",
 }
 
-async def generate_card(lemma: str, text_language: Language, user_language: Language) -> dict:
+async def generate_card(lemma: str, text_language: Language, user_language: Language) -> list[dict]:
     try:
 
         ready_prompt = CARD_PROMPT.format(
@@ -24,7 +24,7 @@ async def generate_card(lemma: str, text_language: Language, user_language: Lang
 
         response = await client.messages.create(
             model="claude-sonnet-5-5",
-            max_tokens=300,
+            max_tokens=800,
             messages=[{"role": "user", "content": ready_prompt}]
         )
 
@@ -41,12 +41,24 @@ async def generate_card(lemma: str, text_language: Language, user_language: Lang
 
     if not(isinstance(res, dict)):
         raise ValueError("AI response is not dictionary")
-    if res.get("pos") is None:
-        raise ValueError("AI response is missing keys: pos")
-    if res.get("grammar") is None:
-        raise ValueError("AI response is missing keys: grammar")
-    if not res.get("translation"):
-        raise ValueError("AI response is missing keys: translation")
-    PartOfSpeech(res["pos"])
+    if not(res.get("readings")):
+        raise ValueError("AI response is missing keys: readings")
+    if not(isinstance(res.get("readings"), list)):
+        raise ValueError("AI response is not list of dictionary")
+    poses = set()
+    for word in res.get("readings"):
+        if not (isinstance(word, dict)):
+            raise ValueError("AI response is not list of dictionary")
+        if word.get("pos") is None:
+            raise ValueError("AI response is missing keys: pos")
+        if word.get("grammar") is None:
+            raise ValueError("AI response is missing keys: grammar")
+        if not word.get("translation"):
+            raise ValueError("AI response is missing keys: translation")
+        PartOfSpeech(word["pos"])
+        if word["pos"] not in poses:
+            poses.add(word["pos"])
+        else:
+            raise ValueError("AI response repeat pos")
 
-    return res
+    return res["readings"]

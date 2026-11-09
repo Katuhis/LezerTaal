@@ -9,50 +9,43 @@ def get_lemma(word: str, lang: Language) -> str:
     doc = nlp(word)
     return doc[0].lemma_.lower()
 
-async def get_card(
-        word: str,
-        lang: Language,
-        user_lang: Language
-) -> dict:
+async def get_card(word: str, lang: Language, user_lang: Language) -> dict:
     lemma = get_lemma(word, lang)
+    user_key = user_lang.value
 
     card = await db_get_lemma(lemma, lang)
+    ai_readings = None
 
-    if card:
-        if card["translations"].get(user_lang.value):
-            result = {
-                "lemma": lemma,
-                "lang": lang.value,
-                "pos": card["pos"],
-                "grammar": card["grammar"],
-                "translation": card["translations"][user_lang.value]
-            }
-        else:
-            new_card = await generate_card(lemma, lang, user_lang)
-            await db_add_translation(lemma, lang, user_lang, new_card["translation"])
-            result = {
-                "lemma": lemma,
-                "lang": lang.value,
-                "pos": card["pos"],
-                "grammar": card["grammar"],
-                "translation": new_card["translation"]
-            }
-    else:
-        new_card = await generate_card(lemma, lang, user_lang)
-        inserted_card = await db_create_lemma(
-            lemma,
-            lang,
-            new_card["pos"],
-            new_card["grammar"],
-            user_lang,
-            new_card["translation"]
-        )
-        result = {
-            "lemma": lemma,
-            "lang": lang.value,
-            "pos": inserted_card["pos"],
-            "grammar": inserted_card["grammar"],
-            "translation": new_card["translation"]
+    # 1. Карточки нет: просим AI и создаём
+    if not card:
+        ai_readings = await generate_card(lemma, lang, user_lang)
+        card = await db_create_lemma(lemma, lang, user_lang, ai_readings)
+
+    # 2. Какие прочтения ещё без перевода на язык пользователя
+    missing = [
+        pos for pos, reading in card["readings"].items()
+        if user_key not in reading["translations"]
+    ]
+    if missing:
+        if ai_readings is None:
+            ai_readings = await generate_card(lemma, lang, user_lang)
+        new_translations = {
+            r["pos"]: r["translation"]
+            for r in ai_readings
+            if r["pos"] in missing
         }
+        await db_add_translation(lemma, lang, user_lang, new_translations)
+        for pos, translation in new_translations.items():
+            card["readings"][pos]["translations"][user_key] = translation
 
-    return result
+    # 3. Собираем ответ
+    readings = [
+        {
+            "pos": pos,
+            "grammar": reading["grammar"],
+            "translation": reading["translations"][user_key],
+        }
+        for pos, reading in card["readings"].items()
+        if user_key in reading["translations"]
+    ]
+    return {"lemma": lemma, "lang": lang.value, "readings": readings}
